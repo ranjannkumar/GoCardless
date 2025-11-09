@@ -25,15 +25,19 @@ export class GoCardlessProvider implements PaymentProvider {
     private async getHeaders() {
         if (Object.keys(this.settings).length === 0) {
             this.settings = await getSettings();
+            console.log("GC Settings Loaded:", this.settings);
         }
         return {
             'Authorization': `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
-            'GoCardless-Version': '2015-00-01', // Use a stable API version
+            'GoCardless-Version': '2015-07-06', // Use a stable API version
         };
     }
 
     async createPayment(mandateId: string, amount_cents: number, description: string, metadata: Record<string, unknown>): Promise<{ gc_payment_id: string }> {
+        // Load settings first to ensure default_currency is available
+        const headers = await this.getHeaders();
+        
         const body = {
             payments: {
                 amount: amount_cents,
@@ -50,7 +54,7 @@ export class GoCardlessProvider implements PaymentProvider {
 
         const response = await fetch(`${this.baseUrl}/payments`, {
             method: 'POST',
-            headers: await this.getHeaders(),
+            headers: headers,
             body: JSON.stringify(body),
         });
 

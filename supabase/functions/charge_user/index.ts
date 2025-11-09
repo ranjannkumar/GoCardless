@@ -3,8 +3,8 @@ import { serve } from "https://deno.land/std@0.207.0/http/server.ts";
 import { PaymentService } from '../../../src/core/charge.ts';
 // NOTE: For a real deployment, you'd use gocardless.ts
 // For local testing, you might use mock.ts or switch based on an env var.
-import { MockPaymentProvider } from '../../../src/payments/mock.ts';
-// import { GoCardlessProvider } from '../../../src/payments/gocardless.ts';
+// import { MockPaymentProvider } from '../../../src/payments/mock.ts';
+import { GoCardlessProvider } from '../../../src/payments/gocardless.ts';
 
 // Get access to the DB with Service Role for RLS bypass
 const supabase = createClient(
@@ -12,7 +12,8 @@ const supabase = createClient(
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 );
 
-const provider = new MockPaymentProvider(); // Replace with GoCardlessProvider in production
+// const provider = new MockPaymentProvider(); // Replace with GoCardlessProvider in production
+const provider = new GoCardlessProvider();
 const paymentService = new PaymentService(supabase, provider);
 
 serve(async (req) => {
